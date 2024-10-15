@@ -1,12 +1,21 @@
 import RestoreWallet from "@/components/ui/find_wallet";
+import icon from "@/public/icon.png"
+import Image from "next/image";
+import bg_home from "@/public/bg_home.png";
 
 export default function ImportWallet() {
     return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <div 
+        style={{
+            backgroundImage: `url(${bg_home.src})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+        }}  className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
             <header className="row-start-1 items-center justify-center mt-20">
-                <img
+                <Image
                     className="dark:invert mt-10"
-                    src="./public/img/icon.png"
+                    src={icon}
                     alt="Boxer logo"
                     width={100}
                     height={100}

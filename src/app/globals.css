@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 body {
-  background-image: url('public/img/bg_home.png');
-  background-size: cover; /* Ảnh nền phủ kín màn hình */
-  background-position: center; /* Căn giữa ảnh nền */
-  background-repeat: no-repeat; /* Không lặp lại ảnh nền */
   width: 100vw; /* Chiều rộng cố định như trên màn hình mobile */
   max-width: 450px;
   height: fit-content;

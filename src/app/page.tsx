@@ -1,15 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import DeployButton from "@/components/ui/deploy-button";
-
+import icon from "@/public/icon.png"
 export default function Home() {
   return (
     <div className="min-h-[100vh] flex flex-col justify-between p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <header className="flex flex-col items-center">
         <p className="text-center text-3xl font-bold">Boxer Clans</p>
-        <img
+        <Image
           className="dark:invert mt-10"
-          src="./public/img/icon.png"
+          src={icon}
           alt="Boxer logo"
           width={100}
           height={100}

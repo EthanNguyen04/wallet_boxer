@@ -39,11 +39,11 @@ const WalletInfo = () => {
             textarea.select();
             try {
                 document.execCommand("copy");
-                setCopySuccess("Sao chép thành công!"); // Thông báo thành công
+                setCopySuccess("Success!"); // Thông báo thành công
                 router.push("/home");
             } catch (err) {
                 console.error('Failed to copy: ', err);
-                setCopySuccess("Sao chép thất bại."); // Thông báo thất bại
+                setCopySuccess("Fail !"); // Thông báo thất bại
             }
             document.body.removeChild(textarea);
         }
