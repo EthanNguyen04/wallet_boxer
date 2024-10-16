@@ -1,6 +1,11 @@
 import Index from "@/app/home/ui/Index";
 import bg_home from "@/public/bg_home.png";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+    title: "Play boxing",
+    description: "Play boxing",
+  };
 export default function HomeWallet() {
     return (
         <div
