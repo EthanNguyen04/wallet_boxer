@@ -270,7 +270,7 @@ const Index = () => {
 
               {/* Navigation Images nằm dưới cùng */}
                 <div className="flex flex-row items-center justify-between px-2 pb-2">
-                    {[f1, f2, f3, f4].map((frame, index) => (
+                    {/* {[f1, f2, f3, f4].map((frame, index) => (
                     <Image
                         key={index}
                         src={frame}
@@ -278,7 +278,16 @@ const Index = () => {
                         className="cursor-pointer"
                         style={{ width: '24%', height: 'auto' }}
                     />
-                    ))}
+                    ))} */}
+
+                    <div className="boxing cursor-pointer" style={{ width: '24%', height: 'auto', backgroundColor: '#FCB502' }}>
+                    <Image
+                        src={f1}
+                        alt={'121'}
+                        className="cursor-pointer"
+                        style={{ width: 'v-w', height: 'v-h' }}
+                    />
+                    </div>
                 </div>
             </div>
           </div>
