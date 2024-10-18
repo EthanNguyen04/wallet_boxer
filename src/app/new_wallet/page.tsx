@@ -1,6 +1,11 @@
 import WalletInfo from "@/components/ui/wallet_info";
 import bg_home from "@/public/bg_home.png";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+    title: "Info boxer",
+    description: "Info boxer",
+  };
 export default function NewWallet() {
     return (
         <div

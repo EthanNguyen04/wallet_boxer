@@ -14,49 +14,113 @@ import cup from "@/public/3_cup.png";
 import next from "@/public/next_icon.png"; 
 import tapBtn from "@/public/tap_btn.png"; 
 import energy from "@/public/E_icon.png"; 
-import nv from "@/public/nv.png"; 
-import nv2 from "./image/nv2.png"; 
+import dt1 from "@/public/img_damt/dt1.png"; 
+import dt2 from "@/public/img_damt/dt2.png"; 
+import dt3 from "@/public/img_damt/dt3.png"; 
+import dt4 from "@/public/img_damt/dt4.png"; 
+import dt5 from "@/public/img_damt/dt5.png"; 
+import dp1 from "@/public/img_damp/dp1.png"; 
+import dp2 from "@/public/img_damp/dp2.png"; 
+import dp3 from "@/public/img_damp/dp3.png"; 
+import dp4 from "@/public/img_damp/dp4.png"; 
+import dp5 from "@/public/img_damp/dp5.png"; 
+
+import n1 from "@/public/img_start/n01.png";
+import n3 from "@/public/img_start/n03.png";
+import n4 from "@/public/img_start/n04.png";
+import n5 from "@/public/img_start/n05.png";
+import n6 from "@/public/img_start/n06.png";
+import n7 from "@/public/img_start/n07.png";
+import n8 from "@/public/img_start/n08.png";
+import n9 from "@/public/img_start/n09.png";
+import n10 from "@/public/img_start/n10.png";
+import n11 from "@/public/img_start/n11.png";
+import n12 from "@/public/img_start/n12.png";
+import n13 from "@/public/img_start/n13.png";
+import n14 from "@/public/img_start/n14.png";
+import n15 from "@/public/img_start/n15.png";
+import n17 from "@/public/img_start/n17.png";
+
+
+
 
 import { useEffect, useState } from "react";
 
 const Index = () => { 
-
+    const autoImages =  [n1, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n17]; // Mảng chứa các hình ảnh tự động chạy
+    const clickImages1 = [dt1, dt2, dt3, dt4, dt5]; // Mảng chứa các hình ảnh khi bấm
+    const clickImages2 = [dp1, dp2, dp3, dp4,dp5]; // Mảng chứa các hình ảnh khi bấm
     const [isFaded, setIsFaded] = useState(false);
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
-    const address = localStorage.getItem("walletAddress");
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isAnimating, setIsAnimating] = useState(false); // Kiểm soát việc tự động chạy ảnh
+    const [isClickMode, setIsClickMode] = useState(false); // Kiểm soát khi nào chạy mảng click
+    const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Lưu trữ ID của interval
+    const [clickImages, setClickImages] = useState(clickImages1); // Mảng clickImages được chọn ngẫu nhiên
 
     useEffect(() => {
-        // Lấy dữ liệu từ localStorage
-        const address = localStorage.getItem("walletAddress");
-
-        // Cập nhật trạng thái
-        setWalletAddress(address);
-       
+        // Lấy địa chỉ ví từ localStorage và lưu vào state
+        setWalletAddress(localStorage.getItem("walletAddress"));
     }, []); // Chỉ chạy một lần khi component được mount
-    // Hàm cắt walletAddress chỉ hiển thị 5 ký tự đầu và 5 ký tự cuối
+    
+    // Hàm cắt địa chỉ ví chỉ hiển thị 5 ký tự đầu và 5 ký tự cuối
     const formatWalletAddress = (address: string | null) => {
         if (!address) return null;
         return `${address.slice(0, 5)}...${address.slice(-5)}`;
     };
 
-    
+     // useEffect để tự động chạy ảnh từ mảng autoImages
+     // useEffect để tự động chạy ảnh từ mảng autoImages
+    useEffect(() => {
+        // Dọn dẹp interval cũ trước khi tạo mới
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
 
-    const [currentImage, setCurrentImage] = useState(nv); // Đặt hình ảnh ban đầu
+        // Mảng ảnh hiện tại sẽ chạy (autoImages hoặc clickImages tùy chế độ)
+        const imagesToUse = isClickMode ? clickImages : autoImages;
 
+        // Bắt đầu quá trình tự động thay đổi ảnh
+        const newIntervalId = setInterval(() => {
+            setCurrentImageIndex((prevIndex) => {
+                // Nếu ở chế độ click và đến cuối mảng, quay lại autoImages
+                if (prevIndex === imagesToUse.length - 1 && isClickMode) {
+                    setIsClickMode(false); // Quay lại chế độ autoImages
+                    return 0; // Reset về hình đầu tiên của autoImages
+                }
+                return (prevIndex + 1) % imagesToUse.length; // Chuyển sang ảnh tiếp theo
+            });
+        }, 80); // Đổi ảnh mỗi 1000 ms (1 giây)
+
+        // Lưu lại ID của interval mới
+        setIntervalId(newIntervalId);
+
+        // Dọn dẹp interval khi component unmount
+        return () => {
+            if (newIntervalId) {
+                clearInterval(newIntervalId);
+            }
+        };
+    }, [isClickMode, clickImages]); // Chạy lại mỗi khi isClickMode hoặc clickImages thay đổi
+
+    // Hàm chọn ngẫu nhiên 1 trong 2 mảng clickImages
+    const getRandomClickImages = () => {
+        return Math.random() < 0.5 ? clickImages1 : clickImages2;
+    };
+
+    // Hàm xử lý khi nhấn vào hình
     const handleClick = () => {
-        setIsFaded(true);
-        
-        // Sau khi nhấn, đổi hình ảnh từ tapBtn sang nv2
-        setCurrentImage(nv2); 
+        setClickImages(getRandomClickImages()); // Chọn ngẫu nhiên 1 mảng clickImages
+        setIsClickMode(true); // Chuyển sang chế độ chạy mảng clickImages
+        setCurrentImageIndex(0); // Reset về hình đầu tiên của clickImages
 
-        // Đặt lại độ mờ và hình ảnh sau một thời gian nhất định (200ms)
+        setIsFaded(true); // Bắt đầu hiệu ứng mờ dần
         setTimeout(() => {
-        setIsFaded(false);
-        setCurrentImage(nv);
+            setIsFaded(false); // Kết thúc hiệu ứng mờ sau 200ms
         }, 50);
     };
 
-
+    const imagesToDisplay = isClickMode ? clickImages : autoImages; // Lựa chọn mảng ảnh đang chạy // Lựa chọn mảng ảnh đang chạy
 
 
     return (
@@ -135,7 +199,7 @@ const Index = () => {
 
                 <div className="flex-grow flex items-end w-full justify-center">
                     <Image
-                        src={currentImage}
+                        src={imagesToDisplay[currentImageIndex]}
                         alt="Image avata"
                         className="cursor-pointer w-[50%] mr-30 mb-5"
                     />
@@ -206,7 +270,7 @@ const Index = () => {
 
               {/* Navigation Images nằm dưới cùng */}
                 <div className="flex flex-row items-center justify-between px-2 pb-2">
-                    {[f1, f2, f3, f4].map((frame, index) => (
+                    {/* {[f1, f2, f3, f4].map((frame, index) => (
                     <Image
                         key={index}
                         src={frame}
@@ -214,7 +278,16 @@ const Index = () => {
                         className="cursor-pointer"
                         style={{ width: '24%', height: 'auto' }}
                     />
-                    ))}
+                    ))} */}
+
+                    <div className="boxing cursor-pointer" style={{ width: '24%', height: 'auto', backgroundColor: '#FCB502' }}>
+                    <Image
+                        src={f1}
+                        alt={'121'}
+                        className="cursor-pointer"
+                        style={{ width: 'v-w', height: 'v-h' }}
+                    />
+                    </div>
                 </div>
             </div>
           </div>

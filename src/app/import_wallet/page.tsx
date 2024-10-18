@@ -2,7 +2,12 @@ import RestoreWallet from "@/components/ui/find_wallet";
 import icon from "@/public/icon.png"
 import Image from "next/image";
 import bg_home from "@/public/bg_home.png";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+    title: "Login",
+    description: "Login boxing",
+  };
 export default function ImportWallet() {
     return (
         <div 
