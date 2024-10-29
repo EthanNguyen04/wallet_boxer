@@ -1,19 +1,18 @@
 "use client"; // Đánh dấu đây là Client Component   
 
 import Image from "next/image";
-import f1 from "@/public/Frame1.png";
-import f2 from "@/public/Frame2.png";
-import f3 from "@/public/Frame3.png";
-import f4 from "@/public/Frame4.png";
-import fPlay from "@/public/bg_play.gif";
-import fTap from "@/public/Frame_tap.png";
-import avata from "@/public/ava.png"; 
-import coin from "@/public/1_coin.png"; 
-import money from "@/public/2_money.png"; 
-import cup from "@/public/3_cup.png"; 
-import next from "@/public/next_icon.png"; 
-import tapBtn from "@/public/tap_btn.png"; 
-import energy from "@/public/E_icon.png"; 
+import bg_menu from "@/public/background/bg_menu.png";
+import bg_menu_select from "@/public/background/bg_menu_select.png";
+
+import fPlay from "@/public/background/bg_play.gif";
+import fTap from "@/public/background/bg_home.png";
+import avata from "@/public/icon/avata.png"; 
+import coin from "@/public/icon/1_coin.png"; 
+import money from "@/public/icon/2_money.png"; 
+import cup from "@/public/icon/3_cup.png"; 
+import next from "@/public/icon/next_icon.png"; 
+import tapBtn from "@/public/button/tap_btn.png"; 
+import energy from "@/public/icon/energy.png"; 
 import dt1 from "@/public/img_damt/dt1.png"; 
 import dt2 from "@/public/img_damt/dt2.png"; 
 import dt3 from "@/public/img_damt/dt3.png"; 
@@ -46,12 +45,14 @@ import n17 from "@/public/img_start/n17.png";
 
 import { useEffect, useState } from "react";
 
-const Index = () => { 
+const PlayScreen = () => { 
     const autoImages =  [n1, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n17]; // Mảng chứa các hình ảnh tự động chạy
     const clickImages1 = [dt1, dt2, dt3, dt4, dt5]; // Mảng chứa các hình ảnh khi bấm
     const clickImages2 = [dp1, dp2, dp3, dp4,dp5]; // Mảng chứa các hình ảnh khi bấm
     const [isFaded, setIsFaded] = useState(false);
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
+    const [walletName, setWalletName] = useState<string | null>(null);
+
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false); // Kiểm soát việc tự động chạy ảnh
     const [isClickMode, setIsClickMode] = useState(false); // Kiểm soát khi nào chạy mảng click
@@ -61,6 +62,8 @@ const Index = () => {
     useEffect(() => {
         // Lấy địa chỉ ví từ localStorage và lưu vào state
         setWalletAddress(localStorage.getItem("walletAddress"));
+        setWalletName(localStorage.getItem("walletName"));
+
     }, []); // Chỉ chạy một lần khi component được mount
     
     // Hàm cắt địa chỉ ví chỉ hiển thị 5 ký tự đầu và 5 ký tự cuối
@@ -144,6 +147,7 @@ const Index = () => {
                     <p className="flex justify-center items-center text-center text-xs">
                         <strong className="text-gray-300 mr-1 font-extralight">ID</strong>
                         {formatWalletAddress(walletAddress)}
+                        <strong className="text-white-300 ml-1 font-light">({walletName})</strong>
                     </p>
                     <Image
                             src={next}
@@ -269,25 +273,11 @@ const Index = () => {
        
 
               {/* Navigation Images nằm dưới cùng */}
-                <div className="flex flex-row items-center justify-between px-2 pb-2">
-                    {/* {[f1, f2, f3, f4].map((frame, index) => (
-                    <Image
-                        key={index}
-                        src={frame}
-                        alt={`Image ${index + 1}`}
-                        className="cursor-pointer"
-                        style={{ width: '24%', height: 'auto' }}
-                    />
-                    ))} */}
-
-                    <div className="boxing cursor-pointer" style={{ width: '24%', height: 'auto', backgroundColor: '#FCB502' }}>
-                    <Image
-                        src={f1}
-                        alt={'121'}
-                        className="cursor-pointer"
-                        style={{ width: 'v-w', height: 'v-h' }}
-                    />
-                    </div>
+              <div className="flex flex-row items-center justify-between px-2 pb-2">
+                <Image src={bg_menu_select} alt="Image 1" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
+                <Image src={bg_menu} alt="Image 2" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
+                <Image src={bg_menu} alt="Image 3" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
+                <Image src={bg_menu} alt="Image 4" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
                 </div>
             </div>
           </div>
@@ -295,4 +285,4 @@ const Index = () => {
       );
     };
     
-    export default Index;
+    export default PlayScreen;
