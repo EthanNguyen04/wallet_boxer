@@ -3,17 +3,11 @@
 @tailwind utilities;
 
 body {
-  width: 100vw; /* Chiều rộng cố định như trên màn hình mobile */
   max-width: 450px;
-  height: fit-content;
   margin: 0 auto; /* Căn giữa body khi trên màn hình rộng */
-  justify-content: center; /* Căn giữa theo chiều ngang */
-  align-items: center; /* Căn giữa theo chiều dọc */
   color: #fff;
   overflow: hidden; /* Ngăn cuộn nếu không cần thiết */
 }
-
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
