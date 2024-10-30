@@ -3,6 +3,11 @@
 import Image from "next/image";
 import bg_menu from "@/public/background/bg_menu.png";
 import bg_menu_select from "@/public/background/bg_menu_select.png";
+import boxing from "@/public/icon_menu/boxing.png";
+import friend from "@/public/icon_menu/friends.png";
+import shop from "@/public/icon_menu/shop.png";
+import wallet from "@/public/icon_menu/wallet.png";
+
 
 import fPlay from "@/public/background/bg_play.gif";
 import fTap from "@/public/background/bg_home.png";
@@ -129,87 +134,49 @@ const PlayScreen = () => {
     return (
         <div className="flex main flex-col items-center w-full h-screen">
           {/* Container cho play và tap */}
-            <div className="flex flex-col h-full w-full">
-                {/* Play Section */}
-                <div
-                className="flex flex-col w-full h-[55%] items-center bg-cover bg-center"
-                style={{ backgroundImage: `url(${fPlay.src})` }}
-                >
-                <div className="items-center header flex flex-col mt-1 w-[98%] bg-gradient-to-b from-[#444458] via-[#2A2B3E] to-[#26273A] rounded-lg shadow-inner shadow-gray-600"
-                    style={{ boxShadow: 'inset 0 0 0 1px #676983',}}>
-                    {/* Hàng chứa avatar và văn bản */}
-                    <div className="flex items-center w-full space-x-3 pl-4 pr-4 pt-1">
-                    <Image
-                        src={avata}
-                        alt="Image avata"
-                        className="cursor-pointer rounded-full w-6"
-                    />
-                    <p className="flex justify-center items-center text-center text-xs">
-                        <strong className="text-gray-300 mr-1 font-extralight">ID</strong>
-                        {formatWalletAddress(walletAddress)}
-                        <strong className="text-white-300 ml-1 font-light">({walletName})</strong>
-                    </p>
-                    <Image
-                            src={next}
-                            alt="Image avata"
-                            className="cursor-pointer rounded-full w-4"
-                        />
-                    </div>
-                    <div className="flex flex-row w-full items-center text-center justify-evenly mb-1 mt-2">
-                        <div className="flex items-center max-w-[30%] min-w-[30%] space-x-3 bg-gradient-to-b from-[#26273A] via-[#2A2B3E] to-[#444458] rounded-lg shadow-inner shadow-gray-600 pr-2 p-1"
-                            style={{ boxShadow: 'inset 0 0 0 1px #676983',}}>
-                            <Image
-                                src={coin}
-                                alt="Image avata"
-                                className="cursor-pointer rounded-full w-4"
-                            />
-                            <p className="justify-center text-xs">
-                                237,16k
-                            </p>
-                        </div>
-                        <div className="flex items-center min-w-[30%] space-x-3 bg-gradient-to-b from-[#26273A] via-[#2A2B3E] to-[#444458] rounded-lg shadow-inner shadow-gray-600 pr-2 p-1"
-                            style={{ boxShadow: 'inset 0 0 0 1px #676983',}}>                        
-                            <Image
-                                src={money}
-                                alt="Image avata"
-                                className="cursor-pointer rounded-full w-4"
-                            />
-                            <p className="flex justify-center items-center text-center text-xs">
-                                200,25k
-                            </p>
-                        </div>
-                        <div className="flex items-center min-w-[30%] space-x-3 bg-gradient-to-b from-[#26273A] via-[#2A2B3E] to-[#444458] rounded-lg shadow-inner shadow-gray-600 pr-2 p-1"
-                            style={{ boxShadow: 'inset 0 0 0 1px #676983',}}>
-                            <Image
-                                src={cup}
-                                alt="Image avata"
-                                className="cursor-pointer rounded-full w-4"
-                            />
-                            
-                            <p className="flex justify-center items-center text-center text-xs text-[#F5E022]">
-                                <strong className="text-gray-300 font-extralight mr-1">RANK: </strong>
-                                1110
-                            </p>
-
-                            <Image
-                                src={next}
-                                alt="Image avata"
-                                className="cursor-pointer rounded-full w-4"
-                            />
-                        </div>
-                    </div>
-                    
+          <div className="flex flex-col h-full w-full">
+            
+            {/* Play Section */}
+            <div
+              className="flex flex-col w-full h-[55%] items-center bg-cover bg-center"
+              style={{ backgroundImage: `url(${fPlay.src})` }}
+            >
+              <div className="header flex flex-col mt-1 w-[98%] bg-gradient-to-b from-[#444458] via-[#2A2B3E] to-[#26273A] rounded-lg shadow-inner shadow-gray-600 p-2">
+                {/* Hàng chứa avatar và văn bản */}
+                <div className="flex items-center w-full space-x-3 pl-4 pr-4 pt-1">
+                  <Image src={avata} alt="Avatar" className="cursor-pointer rounded-full w-6" />
+                  <p className="flex justify-center items-center text-xs">
+                    <strong className="text-gray-300 mr-1 font-extralight">ID</strong>
+                    {formatWalletAddress(walletAddress)}
+                    <strong className="text-white-300 ml-1 font-light">({walletName})</strong>
+                  </p>
+                  <Image src={next} alt="Next" className="cursor-pointer rounded-full w-4" />
                 </div>
-
-                <div className="flex-grow flex items-end w-full justify-center">
-                    <Image
-                        src={imagesToDisplay[currentImageIndex]}
-                        alt="Image avata"
-                        className="cursor-pointer w-[50%] mr-30 mb-5"
-                    />
+      
+                {/* Thông tin người dùng */}
+                <div className="flex flex-row w-full items-center text-center justify-evenly mb-1 mt-2">
+                  {[
+                    { src: coin, label: '237,16k' },
+                    { src: money, label: '200,25k' },
+                    { src: cup, label: '1110', color: '#F5E022' }
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center max-w-[30%] min-w-[30%] space-x-3 bg-gradient-to-b from-[#26273A] via-[#2A2B3E] to-[#444458] rounded-lg shadow-inner shadow-gray-600 pr-2 p-1"
+                      style={{ boxShadow: 'inset 0 0 0 1px #676983' }}
+                    >
+                      <Image src={item.src} alt="Icon" className="cursor-pointer rounded-full w-4" />
+                      <p className="text-xs" style={{ color: item.color || 'inherit' }}>{item.label}</p>
+                    </div>
+                  ))}
                 </div>
+              </div>
+      
+              <div className="flex-grow flex items-end w-full justify-center">
+                <Image src={imagesToDisplay[currentImageIndex]} alt="Main Image" className="cursor-pointer w-[50%] mr-30 mb-5" />
+              </div>
             </div>
-    
+      
             {/* Tap Section */}
             <div
               className="w-full h-[45%] bg-cover bg-center items-center flex flex-col justify-end"
@@ -230,16 +197,29 @@ const PlayScreen = () => {
                             <p className="flex text-center text-xs text-[#323349] pt-1 pl-1">
                                 ENERGY
                             </p>
-                            <div className=" h-3 m-1 flex flex-row w-[70%] px-1 bg-gradient-to-r from-[#4C455B] to-[#313249] rounded-3xl overflow-hidden">
-                                
-                            
+                            <div className="h-3 m-1 flex flex-row w-[90%] px-1 bg-gradient-to-r from-[#4C455B] to-[#313249] rounded-3xl overflow-hidden items-center justify-center">
+                                <div className="grid grid-cols-10 gap-[3px] w-full h-[60%] items-center justify-center">
+                                    {/* Dải màu với các ô có màu sắc cố định */}
+                                    <div style={{ backgroundColor: '#E5B703', borderTopRightRadius: '1.5px', borderBottomRightRadius: '1.5px' }} className="h-full w-full rounded-l-md"></div>
+                                    <div style={{ backgroundColor: '#E5B001', borderRadius: '1.5px'  }} className="h-full w-full"></div>
+                                    <div style={{ backgroundColor: '#E5A801', borderRadius: '1.5px' }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E5A102', borderRadius: '1.5px'  }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E59903', borderRadius: '1.5px'  }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E69102', borderRadius: '1.5px'  }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E68A01', borderRadius: '1.5px'  }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E58200', borderRadius: '1.5px'  }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E57B00', borderRadius: '1.5px'  }} className="h-full w-full "></div>
+                                    <div style={{ backgroundColor: '#E67301', borderTopLeftRadius: '1.5px', borderBottomLeftRadius: '1.5px' }} className="h-full w-full rounded-r-md"></div>
+                                </div>
                             </div>
+
+
                         </div>
                         <div className="p-3 flex flex-row w-full bg-gradient-to-r from-[#36374C] to-[#36374C] justify-center items-center" 
                             style={{ 
                                 background: 'linear-gradient(to left, rgba(54, 55, 76, 1) 16%, rgba(54, 55, 76, 0) 100%)',
                                 borderRadius: '50px 20px 20px 50px', 
-                                boxShadow: 'inset 0 0 0 0.5px #36374C',
+                                boxShadow: 'inset 0 0 0 0.1px #36374C',
                             }}>
                             <p className="flex text-center text-sm text-[#323349] pr-1 text-[#F5E022]">
                                 5500
@@ -261,28 +241,44 @@ const PlayScreen = () => {
 
                     </div>
                 </div>
-
-
-                <Image
-                    src={tapBtn}
-                    alt="Image avata"
-                    className="cursor-pointer rounded-full w-[35%] mb-2"
-                    style={{ opacity: isFaded ? 0.8 : 1 }} // Giảm độ mờ xuống 40%
-                    onClick={handleClick} // Gọi hàm khi nhấn
-                />
-       
-
-              {/* Navigation Images nằm dưới cùng */}
-              <div className="flex flex-row items-center justify-between px-2 pb-2">
-                <Image src={bg_menu_select} alt="Image 1" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
-                <Image src={bg_menu} alt="Image 2" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
-                <Image src={bg_menu} alt="Image 3" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
-                <Image src={bg_menu} alt="Image 4" className="cursor-pointer" style={{ width: '24%', height: 'auto' }} />
+              
+              <Image
+                src={tapBtn}
+                alt="Tap Button"
+                className="cursor-pointer rounded-full w-[35%] mb-2"
+                style={{ opacity: isFaded ? 0.8 : 1 }}
+                onClick={handleClick}
+              />
+      
+              {/* Navigation Images */}
+                <div className="flex flex-row items-center justify-between px-2 pb-2 w-full">
+                    {[
+                    { src: boxing, bg: bg_menu_select, label: 'BOXING', color: '#282635' },
+                    { src: friend, bg: bg_menu, label: 'FRIENDS' },
+                    { src: wallet, bg: bg_menu, label: 'WALLET' },
+                    { src: shop, bg: bg_menu, label: 'SHOP' }
+                    ].map((item, index) => (
+                    <div
+                        key={index}
+                        className="bg-center flex flex-col items-center justify-between py-3"
+                        style={{
+                        backgroundImage: `url(${item.bg.src})`,
+                        width: '24%',
+                        aspectRatio: '1',
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat'
+                        }}
+                    >
+                        <Image src={item.src} alt={`Image ${index + 1}`} className="cursor-pointer max-w-[50%] h-auto" />
+                        <p className="text-sm" style={{ color: item.color || '#FFFFF' }}>{item.label}</p>
+                    </div>
+                    ))}
                 </div>
             </div>
           </div>
         </div>
       );
+      
     };
     
     export default PlayScreen;
