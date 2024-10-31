@@ -13,6 +13,8 @@ import Noti from "@/components/ui_notification/snackbar"
 const CreateAccount = () => {
     const router = useRouter();
     const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+    const [add, setAdd] = useState<string | null>(null);
+
     const [copySuccess, setCopySuccess] = useState<string | null>(null);
 
     const [hasText, setHasText] = useState(false);
@@ -26,6 +28,8 @@ const CreateAccount = () => {
 
     useEffect(() => {
         const seed = localStorage.getItem("seedPhrase");
+        const add = localStorage.getItem("walletAddress");
+        setAdd(add)
         setSeedPhrase(seed);
     }, []);
 
@@ -47,7 +51,8 @@ const CreateAccount = () => {
         // Lưu walletName vào localStorage
         localStorage.setItem("walletName", inputValue);
         // Chuyển đến trang tiếp theo
-        router.push("/creating_account");
+        localStorage.setItem("title", 'Create new account');
+        router.push("/loading_account");
     };
     const handleCopyClick = async () => {
         if (seedPhrase) {
@@ -116,6 +121,8 @@ const CreateAccount = () => {
                     <div className="flex flex-row justify-between items-center">
                         <div className="flex-col">
                             <p className="text-xl text-[#ffffff] scale-y-150">Seed phrase</p>
+                            <p className="text-xl text-[#ffffff] scale-y-150">{add}</p>
+
                             <p className="text-[#b4b4b8] text-sm scale-y-120 mt-2">We have created a unique</p>
                         </div>
 

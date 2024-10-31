@@ -5,10 +5,13 @@ import React, { useState, useEffect } from "react";
 
 const Loading = () => {
     const [progress, setProgress] = useState(1);
+    const [title, setTitle] = useState<string | null>(null);
+
     const router = useRouter();
 
     // Tăng dần từ 1 đến 100 trong 10 giây
     useEffect(() => {
+        setTitle(localStorage.getItem("title"))
         const interval = setInterval(() => {
             setProgress((prev) => {
                 if (prev < 100) {
@@ -68,7 +71,7 @@ const Loading = () => {
             {/* Hiển thị phần trăm */}
             <div className="flex flex-row items-center justify-center w-full mt-5 font-medium">
                 <p className="text-base text-[#F5E022] scale-y-150">{progress}%</p>
-                <p className="ml-2 text-base">Create new account</p> {/* Sử dụng ml-2 để tạo khoảng cách nhỏ giữa các phần tử */}
+                <p className="ml-2 text-base title">{title}</p> {/* Sử dụng ml-2 để tạo khoảng cách nhỏ giữa các phần tử */}
             </div>
 
             <div className="flex flex-row justify-center w-full mt-[40%] font-medium">

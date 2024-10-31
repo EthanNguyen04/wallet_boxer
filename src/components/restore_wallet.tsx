@@ -1,119 +1,192 @@
-"use client"; // Để component có thể xử lý sự kiện phía client
+"use client";
 
-import { useState } from "react";
+import React, { useState } from 'react';
 import { Keypair } from "@solana/web3.js";
-import * as bip39 from "bip39"; // Import thư viện bip39
-import bs58 from "bs58"; // Import thư viện bs58
-import { derivePath } from "ed25519-hd-key"; // Nhập derivePath từ ed25519-hd-key
-import { useRouter } from "next/navigation"; // Import useRouter
+import * as bip39 from "bip39";
+import bs58 from "bs58";
+import { derivePath } from "ed25519-hd-key";
+import { useRouter } from "next/navigation";
+import warning from "@/public/icon/warning.png"; 
+import success from "@/public/icon/success.png"; 
+import eror from "@/public/icon/error.png"; 
+import Notification from '@/components/ui_notification/snackbar';
 
 const RestoreWallet = () => {
-  const router = useRouter(); // Khởi tạo useRouter
+  const router = useRouter();
+  const [seedPhrase, setSeedPhrase] = useState<string>(""); // Dùng seed phrase từ người dùng
+  const [privateKeyInput, setPrivateKeyInput] = useState<string>(""); // Dùng private key từ người dùng
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [privateKey, setPrivateKey] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('tab1'); // Trạng thái tab
+  const [notification, setNotification] = useState<string | null>(null); // Trạng thái thông báo
+  const [notificationImage, setNotificationImage] = useState<string | undefined>(undefined); // Thay đổi null thành undefined
 
-  const [seedPhrase, setSeedPhrase] = useState<string[]>(Array(12).fill("")); // Seed phrase từ người dùng nhập
-  const [fullSeedPhrase, setFullSeedPhrase] = useState<string>(""); // Chuỗi chứa toàn bộ 12 từ dán vào
-  const [walletAddress, setWalletAddress] = useState<string | null>(null); // Public Key của ví
-  const [privateKey, setPrivateKey] = useState<string | null>(null); // Private Key của ví
-  const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
-
-  // Hàm cập nhật seed phrase khi người dùng nhập vào từng ô
-  const handleInputChange = (index: number, value: string) => {
-    const updatedSeed = [...seedPhrase];
-    updatedSeed[index] = value;
-    setSeedPhrase(updatedSeed);
-  };
-
-  // Hàm xử lý khi người dùng dán chuỗi seed phrase đầy đủ
-  // Hàm xử lý khi người dùng dán chuỗi seed phrase đầy đủ
-const handleFullSeedPhraseChange = (value: string) => {
-  const words = value.trim().split(/\s+/); // Tách chuỗi thành mảng các từ
-
-  if (words.length === 12 && bip39.validateMnemonic(words.join(" "))) {
-    setSeedPhrase(words); // Cập nhật mảng seed phrase nếu có đủ 12 từ và hợp lệ
-    setFullSeedPhrase(value); // Cập nhật chuỗi đầy đủ seed phrase
-  } else {
-    alert("Seed phrase phải có đúng 12 từ và hợp lệ!"); // Thông báo nếu số lượng từ không đúng hoặc không hợp lệ
-  }
-};
-
-
-  // Hàm cắt walletAddress chỉ hiển thị 5 ký tự đầu và 5 ký tự cuối
-  const formatWalletAddress = (walletAddress: string | null) => {
-    if (!walletAddress) return null;
-    return `${walletAddress.slice(0, 5)}...${walletAddress.slice(-5)}`;
-  };
-
-  // Hàm khôi phục ví Solana từ seed phrase
+  // Hàm để khôi phục ví từ seed phrase hoặc private key
   const restoreWallet = async () => {
-    setIsLoading(true); // Bắt đầu loading
+    setIsLoading(true);
     try {
-      const mnemonic = seedPhrase.join(" "); // Chuyển seed phrase thành chuỗi
-      const isValid = bip39.validateMnemonic(mnemonic); // Kiểm tra tính hợp lệ của seed phrase
+      let derivedKeypair;
 
-      if (!isValid) {
-        alert("Seed phrase không hợp lệ");
-        setIsLoading(false);
-        return;
+      if (activeTab === 'tab1') { // Nếu đang ở tab seed phrase
+        if (!bip39.validateMnemonic(seedPhrase)) {
+          setNotification("Invalid Seed phrase!"); // Hiển thị thông báo 
+          setNotificationImage(warning.src); // Cập nhật hình ảnh cho thông báo
+          setIsLoading(false); 
+          setTimeout(() => {
+              setNotification(null);
+              setNotificationImage(undefined); // Thay đổi null thành undefined
+          }, 3000);
+          return;
+        }
+        const seed = await bip39.mnemonicToSeed(seedPhrase);
+        const path = `m/44'/501'/0'/0'`;
+        derivedKeypair = Keypair.fromSeed(derivePath(path, seed.toString("hex")).key);
+
+      } else if (activeTab === 'tab2') { // Nếu đang ở tab private key
+        try {
+          const decodedPrivateKey = bs58.decode(privateKeyInput);
+          derivedKeypair = Keypair.fromSecretKey(decodedPrivateKey);
+        } catch (error) {
+          setNotification("Invalid Private key!"); // Hiển thị thông báo 
+          setNotificationImage(warning.src); // Cập nhật hình ảnh cho thông báo
+          setIsLoading(false); // Đánh dấu nút sao chép đã được bấm
+          setTimeout(() => {
+              setNotification(null);
+              setNotificationImage(undefined); // Thay đổi null thành undefined
+          }, 3000);
+          return;
+        }
       }
 
-      const seed = await bip39.mnemonicToSeed(mnemonic); // Tạo seed từ seed phrase
-      const path = `m/44'/501'/0'/0'`; // Đường dẫn BIP44
-      const derivedKeypair = Keypair.fromSeed(derivePath(path, seed.toString("hex")).key); // Tạo keypair từ seed
+      if (!derivedKeypair) {
+        setNotification("Unable to create keypair."); // Hiển thị thông báo lỗi
+        setNotificationImage(warning.src); // Cập nhật hình ảnh cho thông báo
+        // Đặt timeout để ẩn thông báo sau 3 giây
+        setIsLoading(false);
+        setTimeout(() => {
+            setNotification(null);
+            setNotificationImage(undefined); // Thay đổi null thành undefined
+        }, 3000);
 
-      const publicKey = derivedKeypair.publicKey.toBase58(); // Lấy public key
-      const privateKeyBs58 = bs58.encode(derivedKeypair.secretKey); // Chuyển private key sang định dạng Base58
+        return; // Thoát hàm nếu không thể tạo keypair
+      }
 
-      setWalletAddress(publicKey); // Cập nhật public key
-      setPrivateKey(privateKeyBs58); // Cập nhật private key
+      const publicKey = derivedKeypair.publicKey.toBase58();
+      const privateKeyBs58 = bs58.encode(derivedKeypair.secretKey);
+
+      setWalletAddress(publicKey);
+      setPrivateKey(privateKeyBs58);
+
       localStorage.setItem("walletAddress", publicKey);
       localStorage.setItem("privateKey", privateKeyBs58);
-      localStorage.setItem("seedPhrase", mnemonic);
+      localStorage.setItem("seedPhrase", seedPhrase);
 
-          // Sau 2 giây mới điều hướng
-        // Sau 2 giây mới điều hướng
+      setTimeout(() => {
+        localStorage.setItem("title", 'Import account');
+        setNotification("Success"); // Hiển thị thông báo lỗi
+        setNotificationImage(success.src); // Cập nhật hình ảnh cho thông báo
+        // Đặt timeout để ẩn thông báo sau 3 giây
+        router.push("/loading_account");
+        setIsLoading(false);
         setTimeout(() => {
-          router.push("/home"); // Điều hướng sau khi đã hoàn thành tạo ví
-          setIsLoading(false); // Kết thúc trạng thái loading
-        }, 2000);
+            setNotification(null);
+            setNotificationImage(undefined); // Thay đổi null thành undefined
+        }, 3000);
+      }, 2000);
     } catch (error) {
-      console.error("Khôi phục ví thất bại:", error);
+      setNotification("Error"); // Hiển thị thông báo lỗi
+        setNotificationImage(eror.src); // Cập nhật hình ảnh cho thông báo
+        // Đặt timeout để ẩn thông báo sau 3 giây
+        setIsLoading(false);
+        setTimeout(() => {
+            setNotification(null);
+            setNotificationImage(undefined); // Thay đổi null thành undefined
+        }, 3000);
     } finally {
-      setIsLoading(false); // Kết thúc loading
+      setIsLoading(false);
     }
+  };
 
+  // Hàm để xử lý khi nhấp vào tab
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h2 className="text-xl font-semibold mb-4">Input Seed Phrase</h2>
-
-      {/* Nhập toàn bộ seed phrase vào một ô */}
-      <textarea 
-        placeholder="Nhập hoặc dán 12 từ seed phrase"
-        onChange={(e) => handleFullSeedPhraseChange(e.target.value)} // Gọi hàm xử lý khi thay đổi
-        className="bg-[#31354F] border p-2 w-full max-w-[400px] mb-4 text-gray-200 overflow-auto resize-none rounded-lg" // Sử dụng overflow-auto để cuộn và resize-none để không cho phép thay đổi kích thước
-        rows={5} // Thiết lập số hàng mặc định
-      />
-
-      {/* Nút khôi phục ví */}
-      <button
-        onClick={restoreWallet}
-        className="bg-[#CDBA74] text-white py-2 px-4 rounded hover:bg-blue-600"
-        disabled={isLoading} // Vô hiệu hóa nút khi đang loading
-      >
-        {isLoading ? "Loading..." : "Khôi phục ví →"}
-      </button>
-
-      {/* Hiển thị public key và private key sau khi khôi phục */}
-      {walletAddress && privateKey && (
-        <div className="mt-4">
-          <strong className="text-gray-300">Your Wallet Address:</strong> {formatWalletAddress(walletAddress)}
-          <br />
-          <strong className="text-gray-300">Your Seed Phrase:</strong> {fullSeedPhrase}
-        </div>
-      )}
+    <div className="flex flex-col min-h-screen justify-between">
+      <Notification 
+                
+                message={notification} 
+                image={notificationImage} // Truyền hình ảnh vào thông báo
+                onClose={() => {
+                    setNotification(null);
+                    setNotificationImage(undefined);
+                }} 
+            /> {/* Hiển thị thông báo */}
+      <div>
+        <p className="text-[#ffffff] text-[150%] font-bold my-5 scale-y-150">Create new account</p>
+        <p className="text-[#b4b4b8] text-[90%] font-bold my-3">Enter backup seed phrase associated with the account.</p>
+      </div>
+  
+      {/* Tab Navigation */}
+      <div className="flex justify-around mt-5 bg-[#15141F] rounded-xl h-[6vh] ">
+        <button
+          onClick={() => handleTabClick('tab1')}
+          className={`font-bold text-[120%] flex-grow my-1 ml-1 rounded-xl ${activeTab === 'tab1' ? 'bg-[#F5E022] text-[#282635]' : 'bg-[#15141F] text-[#F5E022]'}`}
+        >
+          Seed phrase
+        </button>
+        <button
+          onClick={() => handleTabClick('tab2')}
+          className={`font-bold text-[120%] flex-grow my-1 mr-1 rounded-xl ${activeTab === 'tab2' ? 'bg-[#F5E022] text-[#282635]' : 'bg-[#15141F] text-[#F5E022]'}`}
+        >
+          Private key
+        </button>
+      </div>
+  
+      {/* Nội dung tương ứng với tab */}
+      <div className="mt-10 flex-grow">
+        {activeTab === 'tab1' && (
+          <div>
+            <p className="text-[#b4b4b8] text-base font-bold my-3">Seed phrase</p>
+            <textarea
+              value={seedPhrase}
+              onChange={(e) => setSeedPhrase(e.target.value)}
+              placeholder="Enter seed phrase"
+              className="bg-[#15141F] border border-[#676983] p-2 w-full max-w-[400px] mb-4 text-gray-200 overflow-auto resize-none rounded-xl focus:border-blue-500 focus:outline-none"
+              rows={5}
+            />
+          </div>
+        )}
+        {activeTab === 'tab2' && (
+          <div>
+            <p className="text-[#b4b4b8] text-base font-bold my-3">Private key</p>
+            <textarea
+              value={privateKeyInput}
+              onChange={(e) => setPrivateKeyInput(e.target.value)}
+              placeholder="Enter private key"
+              className="bg-[#15141F] border border-[#676983] p-2 w-full max-w-[400px] mb-4 text-gray-200 overflow-auto resize-none rounded-xl focus:border-blue-500 focus:outline-none"
+              rows={5}
+            />
+          </div>
+        )}
+      </div>
+  
+      {/* Nút ở dưới cùng màn hình */}
+      <div className="flex flex-col items-center gap-4 mb-10">
+        <button
+          onClick={restoreWallet}
+          disabled={isLoading || (activeTab === 'tab1' ? !seedPhrase : !privateKeyInput)} // Kiểm tra giá trị
+          className={`bg-[#F5E022] text-[#323349] px-4 py-2 rounded-xl w-full text-xl ${isLoading || (activeTab === 'tab1' ? !seedPhrase : !privateKeyInput) ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {isLoading ? 'Loading...' : 'Continue →'}
+        </button>
+      </div>
     </div>
   );
+  
+
 };
 
 export default RestoreWallet;

@@ -45,6 +45,7 @@ import n14 from "@/public/img_start/n14.png";
 import n15 from "@/public/img_start/n15.png";
 import n17 from "@/public/img_start/n17.png";
 
+import { useRouter } from "next/navigation"; 
 
 
 
@@ -63,13 +64,21 @@ const PlayScreen = () => {
     const [isClickMode, setIsClickMode] = useState(false); // Kiểm soát khi nào chạy mảng click
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Lưu trữ ID của interval
     const [clickImages, setClickImages] = useState(clickImages1); // Mảng clickImages được chọn ngẫu nhiên
-
+    const router = useRouter();
     useEffect(() => {
-        // Lấy địa chỉ ví từ localStorage và lưu vào state
-        setWalletAddress(localStorage.getItem("walletAddress"));
-        setWalletName(localStorage.getItem("walletName"));
+         // Lấy địa chỉ ví từ localStorage
+    const storedWalletAddress = localStorage.getItem("walletAddress");
+    const storedWalletName = localStorage.getItem("walletName");
 
-    }, []); // Chỉ chạy một lần khi component được mount
+    setWalletAddress(storedWalletAddress);
+    setWalletName(storedWalletName);
+
+    // Kiểm tra ngay sau khi lấy giá trị từ localStorage
+    if (storedWalletAddress == null || storedWalletAddress == "") {
+        router.push("/start_game"); 
+    }
+
+    }, [walletAddress]); // Chỉ chạy một lần khi component được mount
     
     // Hàm cắt địa chỉ ví chỉ hiển thị 5 ký tự đầu và 5 ký tự cuối
     const formatWalletAddress = (address: string | null) => {
@@ -116,6 +125,11 @@ const PlayScreen = () => {
         return Math.random() < 0.5 ? clickImages1 : clickImages2;
     };
 
+    const logout = () => {
+        localStorage.removeItem("walletAddress"); // Xóa mục khỏi localStorage
+
+        setWalletAddress(null);
+    };
     // Hàm xử lý khi nhấn vào hình
     const handleClick = () => {
         setClickImages(getRandomClickImages()); // Chọn ngẫu nhiên 1 mảng clickImages
@@ -150,7 +164,7 @@ const PlayScreen = () => {
                     {formatWalletAddress(walletAddress)}
                     <strong className="text-white-300 ml-1 font-light">({walletName})</strong>
                   </p>
-                  <Image src={next} alt="Next" className="cursor-pointer rounded-full w-4" />
+                  <Image src={next} alt="Next" className="cursor-pointer rounded-full w-4" onClick={logout} />
                 </div>
       
                 {/* Thông tin người dùng */}
@@ -182,7 +196,7 @@ const PlayScreen = () => {
               className="w-full h-[45%] bg-cover bg-center items-center flex flex-col justify-end"
               style={{ backgroundImage: `url(${fTap.src})` }}
             >
-                <div className="mb-[10%] justify-top items-center header flex flex-row w-[90%] bg-gradient-to-r from-[#FDCD19] to-[#77779B] rounded-xl shadow-xl"
+                <div className="mb-[3%] justify-top items-center header flex flex-row w-[90%] bg-gradient-to-r from-[#FDCD19] to-[#77779B] rounded-xl shadow-xl"
                     style={{ 
                         boxShadow: '0 5px 10px #282635'
                     }}>
