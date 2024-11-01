@@ -49,7 +49,7 @@ import { useRouter } from "next/navigation";
 
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const PlayScreen = () => { 
     const autoImages =  [n1, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n17]; // Mảng chứa các hình ảnh tự động chạy
@@ -65,6 +65,13 @@ const PlayScreen = () => {
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null); // Lưu trữ ID của interval
     const [clickImages, setClickImages] = useState(clickImages1); // Mảng clickImages được chọn ngẫu nhiên
     const router = useRouter();
+
+
+  // Khai báo state để lưu trữ tọa độ
+  const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
+  const [message, setMessage] = useState('');
+  const lastClickTime = useRef(Date.now());
+
     useEffect(() => {
          // Lấy địa chỉ ví từ localStorage
     const storedWalletAddress = localStorage.getItem("walletAddress");
@@ -131,7 +138,28 @@ const PlayScreen = () => {
         setWalletAddress(null);
     };
     // Hàm xử lý khi nhấn vào hình
-    const handleClick = () => {
+    const handleClick = (event: React.MouseEvent) => {
+{/* Hiển thị tọa độ trong thẻ <p> */}
+      const currentTime = Date.now();
+    const timeDiff = currentTime - lastClickTime.current;
+
+    // Thiết lập khoảng thời gian chờ (ví dụ: 1000ms = 1 giây)
+    const spamThreshold = 100;
+
+    if (timeDiff < spamThreshold) {
+      setMessage('Vui lòng dừng lại! Bạn đang bấm quá nhanh.');
+      return;
+    }
+
+    // Cập nhật thời gian click cuối cùng
+    lastClickTime.current = currentTime;
+      const x = event.clientX;
+      const y = event.clientY;
+      setCoordinates({ x, y }); // Cập nhật tọa độ
+ {/* Hiển thị tọa độ trong thẻ <p> */}
+
+
+
         setClickImages(getRandomClickImages()); // Chọn ngẫu nhiên 1 mảng clickImages
         setIsClickMode(true); // Chuyển sang chế độ chạy mảng clickImages
         setCurrentImageIndex(0); // Reset về hình đầu tiên của clickImages
@@ -170,9 +198,9 @@ const PlayScreen = () => {
                 {/* Thông tin người dùng */}
                 <div className="flex flex-row w-full items-center text-center justify-evenly mb-1 mt-2">
                   {[
-                    { src: coin, label: '237,16k' },
-                    { src: money, label: '200,25k' },
-                    { src: cup, label: '1110', color: '#F5E022' }
+                    { src: coin, label: '0' },
+                    { src: money, label: '0' },
+                    { src: cup, label: '_', color: '#F5E022' }
                   ].map((item, index) => (
                     <div
                       key={index}
@@ -236,13 +264,13 @@ const PlayScreen = () => {
                                 boxShadow: 'inset 0 0 0 0.1px #36374C',
                             }}>
                             <p className="flex text-center text-sm text-[#323349] pr-1 text-[#F5E022]">
-                                5500
+                                0
                             </p>
                             <p className="flex text-center text-sm text-[#323349] pr-1 text-[#fff]">
                                 / 
                             </p>
                             <p className="flex text-center text-sm text-[#323349] pr-1 text-[#fff]">
-                                10000
+                                0
                             </p>
                             <Image
                                 src={coin}
@@ -263,7 +291,10 @@ const PlayScreen = () => {
                 style={{ opacity: isFaded ? 0.8 : 1 }}
                 onClick={handleClick}
               />
-      
+ {/* Hiển thị tọa độ trong thẻ <p> */}
+      <p>Tọa độ X: {coordinates.x}, Tọa độ Y: {coordinates.y}</p>
+      {message && <p>{message}</p>}
+ {/* Hiển thị tọa độ trong thẻ <p> */}      
               {/* Navigation Images */}
                 <div className="flex flex-row items-center justify-between px-2 pb-2 w-full">
                     {[

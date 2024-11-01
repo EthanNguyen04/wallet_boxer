@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import copy_ic from "@/public/icon/copy.png"; 
-import warning from "@/public/icon/warning.png"; 
 import success from "@/public/icon/success.png"; 
 import eror from "@/public/icon/error.png"; 
 
@@ -13,10 +12,6 @@ import Noti from "@/components/ui_notification/snackbar"
 const CreateAccount = () => {
     const router = useRouter();
     const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
-    const [add, setAdd] = useState<string | null>(null);
-
-    const [copySuccess, setCopySuccess] = useState<string | null>(null);
-
     const [hasText, setHasText] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [message, setMessage] = useState('0/25'); // Đặt trạng thái ban đầu cho số ký tự
@@ -28,8 +23,6 @@ const CreateAccount = () => {
 
     useEffect(() => {
         const seed = localStorage.getItem("seedPhrase");
-        const add = localStorage.getItem("walletAddress");
-        setAdd(add)
         setSeedPhrase(seed);
     }, []);
 
@@ -58,7 +51,6 @@ const CreateAccount = () => {
         if (seedPhrase) {
             try {
                 await navigator.clipboard.writeText(seedPhrase); // Lưu seedPhrase vào clipboard
-                setCopySuccess("Seed phrase copied!"); // Hiển thị thông báo sao chép thành công
                 setNotification("Seed phrase copied!"); // Hiển thị thông báo sao chép thành công
                 setNotificationImage(success.src); // Cập nhật hình ảnh cho thông báo
                 setIsCopyClicked(true); // Đánh dấu nút sao chép đã được bấm
@@ -121,8 +113,6 @@ const CreateAccount = () => {
                     <div className="flex flex-row justify-between items-center">
                         <div className="flex-col">
                             <p className="text-xl text-[#ffffff] scale-y-150">Seed phrase</p>
-                            <p className="text-xl text-[#ffffff] scale-y-150">{add}</p>
-
                             <p className="text-[#b4b4b8] text-sm scale-y-120 mt-2">We have created a unique</p>
                         </div>
 
