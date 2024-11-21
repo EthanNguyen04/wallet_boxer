@@ -215,18 +215,13 @@ const PlayScreen = () => {
               </div>
       
               <div className="flex-grow flex items-end w-full justify-center">
-                <Image src={imagesToDisplay[currentImageIndex]} alt="Main Image" className="cursor-pointer w-[50%] mr-30 mb-5" />
+                <Image src={imagesToDisplay[currentImageIndex]} loading="eager" priority alt="Main Image" className="cursor-pointer w-[50%] mr-30 mb-5" />
               </div>
             </div>
-      
-            {/* Tap Section */}
-            <div
-              className="w-full h-[45%] bg-cover bg-center items-center flex flex-col justify-end"
-              style={{ backgroundImage: `url(${fTap.src})` }}
-            >
-                <div className="mb-[3%] justify-top items-center header flex flex-row w-[90%] bg-gradient-to-r from-[#FDCD19] to-[#77779B] rounded-xl shadow-xl"
-                    style={{ 
-                        boxShadow: '0 5px 10px #282635'
+      {/* Energy UI */}
+                  <div className="flex items-center bg-gradient-to-r from-[#FDCD19] to-[#77779B] rounded-xl shadow-xl absolute top-[58vh] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[450px]"
+                    style={{
+                        boxShadow: '0 5px 10px #282635' // Nếu bạn muốn giữ lại bóng đổ tùy chỉnh
                     }}>
 
                     <div className="flex items-center w-full">
@@ -282,7 +277,12 @@ const PlayScreen = () => {
                     <div>
 
                     </div>
-                </div>
+                  </div>
+            {/* Tap Section */}
+            <div
+              className="w-full h-[45%] bg-cover bg-center items-center flex flex-col justify-end"
+              style={{ backgroundImage: `url(${fTap.src})` }}
+            >
               
               <Image
                 src={tapBtn}

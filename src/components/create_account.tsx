@@ -6,14 +6,23 @@ import Image from "next/image";
 import copy_ic from "@/public/icon/copy.png"; 
 import success from "@/public/icon/success.png"; 
 import eror from "@/public/icon/error.png"; 
-
-
 import Noti from "@/components/ui_notification/snackbar"
+import bs58 from "bs58"; 
+
+//test smcontract
+import { Connection, PublicKey, clusterApiUrl, Keypair, SystemProgram } from '@solana/web3.js';
+import {Program, AnchorProvider, Wallet} from '@project-serum/anchor';
+import { CustomWallet } from '@/class/CustomWallet'; // Import CustomWallet
+
+import idl from './idl.json'; // Đường dẫn chính xác đến file IDL
+
 const CreateAccount = () => {
+    
     const router = useRouter();
     const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
+    const [wl, setwl] = useState<string | null>(null);
+
     const [hasText, setHasText] = useState(false);
-    const [inputValue, setInputValue] = useState('');
     const [message, setMessage] = useState('0/25'); // Đặt trạng thái ban đầu cho số ký tự
     const [isLimitExceeded, setIsLimitExceeded] = useState(false); // Trạng thái khi vượt giới hạn
     const [isCopyClicked, setIsCopyClicked] = useState(false); // Trạng thái khi nút sao chép được bấm
@@ -23,15 +32,22 @@ const CreateAccount = () => {
 
     useEffect(() => {
         const seed = localStorage.getItem("seedPhrase");
+        setwl(localStorage.getItem("walletAddress"));
         setSeedPhrase(seed);
     }, []);
+
+   //smcontract
+   const [boxerName, setBoxerName] = useState('');
+   const boxerWallet = localStorage.getItem("walletAddress");
+   const privateKeyBs58 = localStorage.getItem("privateKey"); // đây là dang base58
+
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
 
         // Kiểm tra giới hạn độ dài
         if (newValue.length <= 25) {
-            setInputValue(newValue); // Cập nhật giá trị
+            setBoxerName(newValue); // Cập nhật giá trị
             setMessage(`${newValue.length}/25`); // Cập nhật thông báo độ dài
             setHasText(newValue.length > 0); // Cập nhật trạng thái có nội dung
             setIsLimitExceeded(false); // Không hiển thị cảnh báo
@@ -40,35 +56,112 @@ const CreateAccount = () => {
             setIsLimitExceeded(true); // Hiển thị cảnh báo
         }
     };
-    const handleCreateClick = () => {
-        // Lưu walletName vào localStorage
-        localStorage.setItem("walletName", inputValue);
-        // Chuyển đến trang tiếp theo
-        localStorage.setItem("title", 'Create new account');
-        router.push("/loading_account");
+
+
+
+
+    const programId = new PublicKey(idl.address); // Lấy địa chỉ từ IDL
+    const network = 'https://api.devnet.solana.com'; // hoặc URL của devnet
+    const opts = {
+    preflightCommitment: 'processed',
+    };
+
+    const handleCreateClick = async  () => {
+       
+        if (!boxerWallet || !privateKeyBs58) {
+            alert("Missing wallet or private key information.");
+            return;
+        }
+
+        const privateKey = bs58.decode(privateKeyBs58);
+        const userKeypair = Keypair.fromSecretKey(privateKey);
+        const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+        
+        const programId = new PublicKey(idl.address); // Sử dụng địa chỉ từ IDL
+        const provider = new AnchorProvider(connection, new Wallet(userKeypair), { commitment: 'confirmed' });
+        
+        // Khởi tạo Program với IDL
+        const program = new Program(idl, programId, provider);
+
+        // Tạo boxer account mới
+        const boxerAccount = Keypair.generate();
+
+
+        try {
+            // Tạo giao dịch
+        const tx = await program.rpc.add_boxer(boxerName, boxerWallet, {
+            accounts: {
+                boxer: boxerAccount.publicKey,
+                user: userKeypair.publicKey,
+                systemProgram: SystemProgram.programId,
+            },
+        });
+
+        // Gửi giao dịch và xác nhận
+        const txSignature = await provider.sendAndConfirm(tx, [userKeypair, boxerAccount]);
+
+
+            // Hiển thị kết quả
+            setNotification("Boxer created successfully!");
+            setNotificationImage(success.src);
+            setTimeout(() => {
+                setNotification(null);
+                setNotificationImage(undefined);
+            }, 3000);
+            setMessage("Transaction signature:"+ txSignature);
+
+             // Lưu walletName vào localStorage
+            localStorage.setItem("walletName", boxerName);
+            // Chuyển đến trang tiếp theo
+            localStorage.setItem("title", 'Create new account');
+            //router.push("/loading_account");
+            
+        } catch (err) {
+            setNotification("Error creating boxer!");
+            setNotificationImage(eror.src);
+            setTimeout(() => {
+                setNotification(null);
+                setNotificationImage(undefined);
+            }, 3000);
+            setMessage("Error during transaction:"+ err);
+        }
     };
     const handleCopyClick = async () => {
         if (seedPhrase) {
             try {
-                await navigator.clipboard.writeText(seedPhrase); // Lưu seedPhrase vào clipboard
-                setNotification("Seed phrase copied!"); // Hiển thị thông báo sao chép thành công
-                setNotificationImage(success.src); // Cập nhật hình ảnh cho thông báo
-                setIsCopyClicked(true); // Đánh dấu nút sao chép đã được bấm
+                if (navigator.clipboard && window.isSecureContext) {
+                    // Phương pháp chính với navigator.clipboard
+                    await navigator.clipboard.writeText(seedPhrase);
+                } else {
+                    // Fallback với document.execCommand
+                    const textArea = document.createElement("textarea");
+                    textArea.value = seedPhrase;
+                    textArea.style.position = "fixed"; // Đảm bảo không làm xáo trộn UI
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                }
+                setNotification("Seed phrase copied!");
+                setNotificationImage(success.src);
+                setIsCopyClicked(true);
                 setTimeout(() => {
                     setNotification(null);
-                    setNotificationImage(undefined); // Thay đổi null thành undefined
+                    setNotificationImage(undefined);
                 }, 3000);
             } catch (err) {
-                setNotification("Error copy!"); // Hiển thị thông báo sao chép thành công
-                setNotificationImage(eror.src); // Cập nhật hình ảnh cho thông báo
-                setIsCopyClicked(false); // Đánh dấu nút sao chép đã được bấm
+                setNotification("Error copy!");
+                setNotificationImage(eror.src);
+                setIsCopyClicked(false);
                 setTimeout(() => {
                     setNotification(null);
-                    setNotificationImage(undefined); // Thay đổi null thành undefined
+                    setNotificationImage(undefined);
                 }, 3000);
             }
         }
     };
+    
 
     return (
         <div className="flex flex-col w-full h-[100vh] pb-10">
@@ -85,7 +178,7 @@ const CreateAccount = () => {
             <div className="flex-grow">
                 <p className="text-[#b4b4b8] font-bold my-2">Wallet name</p>
                 <input
-                    value={inputValue}
+                    value={boxerName}
                     className={`border rounded-xl w-full h-10 px-4 py-2 placeholder-gray-700 ${isLimitExceeded ? 'border-red-500' : hasText ? 'border-[#F5E022]' : 'border-[#676983]'}
                     bg-[#15141F] focus:border-blue-500 focus:outline-none`}
                     placeholder="Enter user name"
@@ -95,6 +188,11 @@ const CreateAccount = () => {
                     className={`text-right font-bold my-2 ${isLimitExceeded ? 'text-red-500 animate-blink' : 'text-[#b4b4b8]'}`}
                 >
                     {message}
+                </p>
+                <p
+                    className={`text-right font-bold my-2 ${isLimitExceeded ? 'text-red-500 animate-blink' : 'text-[#b4b4b8]'}`}
+                >
+                    {wl}
                 </p>
                 <style jsx>{`
                     @keyframes blink {
