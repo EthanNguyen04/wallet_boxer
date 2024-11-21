@@ -215,7 +215,7 @@ const PlayScreen = () => {
               </div>
       
               <div className="flex-grow flex items-end w-full justify-center">
-                <Image src={imagesToDisplay[currentImageIndex]} alt="Main Image" className="cursor-pointer w-[50%] mr-30 mb-5" />
+                <Image src={imagesToDisplay[currentImageIndex]} loading="eager" priority alt="Main Image" className="cursor-pointer w-[50%] mr-30 mb-5" />
               </div>
             </div>
       {/* Energy UI */}

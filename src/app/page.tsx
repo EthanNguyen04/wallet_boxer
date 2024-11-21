@@ -15,7 +15,7 @@ export default function Home() {
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
             }} 
-            className="background-container min-h-[100vh] flex flex-col justify-between font-[family-name:var(--font-geist-sans)]">
+            className="min-h-[100vh] background-container min-h-[100vh] flex flex-col justify-between font-[family-name:var(--font-geist-sans)]">
                 <PlayScreen />
     </div>
   );

@@ -24,6 +24,7 @@ export default function CreateWallet() {
     localStorage.setItem("walletAddress", publicKey);
     localStorage.setItem("privateKey", privateKeyBs58);
     localStorage.setItem("seedPhrase", newSeedPhrase);
+    localStorage.setItem("keypair", JSON.stringify(Array.from(derivedKeypair.secretKey)));
 
     setTimeout(() => {
       router.push("/create_account"); 

@@ -1,0 +1,91 @@
+{
+  "version": "0.1.0",
+  "name": "contract_boxergame",
+  "metadata": {
+    "name": "contract_boxergame",
+    "version": "0.1.0",
+    "spec": "https://github.com/project-serum/anchor/blob/master/docs/idl.md",
+    "description": "Created with Anchor"
+  },
+  "address": "4nwey6snVDqLTrY9haVwegSyR29eQDwmq4jCb1kt8V5Z",
+  "instructions": [
+    {
+      "name": "add_boxer",
+      "discriminator": [
+        22, 108, 28, 44, 95, 99, 199, 242
+      ],
+      "accounts": [
+        {
+          "name": "boxer",
+          "writable": true,
+          "signer": false
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "boxer_name",
+          "type": "string"
+        },
+        {
+          "name": "boxer_wallet",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Boxer",
+      "discriminator": [
+        130, 52, 209, 177, 210, 23, 2, 114
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Boxer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "boxer_name",
+            "type": "string"
+          },
+          {
+            "name": "boxer_wallet",
+            "type": "string"
+          },
+          {
+            "name": "boxer_coin",
+            "type": "u64"
+          },
+          {
+            "name": "boxer_rank",
+            "type": "u64"
+          },
+          {
+            "name": "boxer_energy_day",
+            "type": "i64"
+          },
+          {
+            "name": "boxer_energy",
+            "type": "u32"
+          },
+          {
+            "name": "boxer_coin_earn",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ]
+}
